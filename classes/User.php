@@ -15,9 +15,24 @@ class User
     private $dbConnection = null;
     
     /**
-    * @var name
+    * @var int
+    */
+    private $userId;
+    
+    /**
+    * @var string
     */
     private $name;
+    
+    /**
+    * @var int
+    */
+    private $isAdmin = 0;
+    
+    /**
+    * @var array
+    */
+    private $feedArray = array();
     
     /**
     * stores error messages for display in the view
@@ -57,13 +72,21 @@ class User
             
             if (!$this->dbConnection->connect_errno) {
                 // db query
-                $sql = $this->dbConnection->prepare("SELECT name, password FROM users WHERE name = ? and password = ?");
+                $sql = $this->dbConnection->prepare("SELECT id, name, is_admin FROM users WHERE name = ? and password = ?");
                 $sql->bind_param("ss", $this->name, $password);
                 
                 
                 $sql->execute();
-                $sql->store_result(); // binds the last given result to the $sql object
+                /* bind result variables */
+                $sql->bind_result($this->userId, $this->name, $this->isAdmin);
+                /* fetch values */
+                while ($sql->fetch()) {
+                    printf ("%s (%s)\n", $this->name, $this->isAdmin);
+                }
                 
+                $this->getRssFeeds();
+
+                $sql->store_result(); // binds the last given result to the $sql object
                 if ($sql->num_rows == 1) { // successfull login
                     $_SESSION["user"]               = $this;
                     $_SESSION["user_login_status"]  = 1;
@@ -72,7 +95,7 @@ class User
                     $this->errors[]                 = "wrong username / password";
                 }
                 
-                $this->dbConnection->close();
+                # check first if open $this->dbConnection->close();
                 # $sql->num_rows;
                 
             } else {
@@ -101,7 +124,7 @@ class User
         if (isset($_SESSION["user_login_status"]) AND $_SESSION["user_login_status"] == 1) {
             return true;
         }
-        // default return
+        
         return false;
     }
     
@@ -110,21 +133,44 @@ class User
         return $this->name;
     }
     
+    /**
+    * @returns int
+    */
+    public function isAdmin() 
+    {
+        return $this->isAdmin;
+    }
+    
+    /**
+    * @returns int
+    */
+    public function getUserId() 
+    {
+        return $this->userId;    
+    }
+    
+    /**
+    * retrieve all saved RSS Feeds for this user
+    */
     public function getRssFeeds() 
     {
+        $this->feedArray = array();
         
-        $this->dbConnection = new mysqli(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME);
-            
-            if (!$this->dbConnection->connect_errno) {
-                // db query
-                $result = $this->dbConnection->query("SELECT * FROM jadu.feeds;");
-                
-                $this->dbConnection->close();
-                # $sql->num_rows;
-                
-            } else {
-                // @TODO custom error message depending on the error type
-                $this->errors[] = "Could not connect to Database " . DB_NAME . " at "  . DB_HOST ;
+        $this->dbConnection = new mysqli(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME);    
+        if (!$this->dbConnection->connect_errno) {
+            // db query
+            $result = $this->dbConnection->query("SELECT feeds.* FROM jadu.feeds "
+                                                   . " JOIN jadu.users_feeds ON users_feeds.feed_id = feeds.id "
+                                                   . " WHERE users_feeds.user_id = " . $this->userId. ";") or die("a mysql error has occured: " . $this->dbConnection->errno);
+            while ($row = $result->fetch_row()) {
+                $this->feedArray[] = $row;
             }
+                
+        } else {
+            // @TODO custom error message depending on the error type
+            $this->errors[] = "Could not connect to Database " . DB_NAME . " at "  . DB_HOST ;
+        }
+        
+        return $this->feedArray;
     }
 }
