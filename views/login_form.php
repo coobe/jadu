@@ -3,9 +3,9 @@
         <h1>RSS Webapp</h1>
     <?php
     // show errors
-    if (isset($login)) {
-        if ($login->errors) {
-            foreach ($login->errors as $error) {
+    if (isset($user)) {
+        if ($user->errors) {
+            foreach ($user->errors as $error) {
                 echo "<div class='row alert alert-danger'>" . $error . "</div>";
             }
         }

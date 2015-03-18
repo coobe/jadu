@@ -49,12 +49,13 @@ if($_SERVER["HTTPS"] != "on") {
 // include db configuration
 require_once("config/db.php");
 
-// instantiate login object
-require_once("classes/Login.php");
-$login = new Login();
+// load classes
+require_once("classes/User.php");
 
 // check if user is logged in and render the appropriate view
-if ($login->isUserLoggedIn() == true) {
+$user = new User();
+if ($user->isLoggedIn() == true) {
+    $user = $_SESSION["user"];
     include("views/dashboard.php");
 } else {
     include("views/login_form.php");

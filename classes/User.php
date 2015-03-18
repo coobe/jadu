@@ -6,7 +6,7 @@
 * @author Torsten Oppermann
 * @since 17.03.2015
 */
-class Login
+class User
 {
     /**
     * stores the db connection
@@ -15,10 +15,17 @@ class Login
     private $dbConnection = null;
     
     /**
+    * @var name
+    */
+    private $name;
+    
+    /**
     * stores error messages for display in the view
     * @var array
     */ 
     public $errors = array();
+    
+    
     
     public function __construct() 
     {
@@ -36,14 +43,14 @@ class Login
     */ 
     private function login() 
     {
-        if (empty($_POST['username'])) {
+        if (empty($_POST["username"])) {
             $this->errors[] = "Please enter your username";
-        } elseif (empty($_POST['password'])) {
+        } elseif (empty($_POST["password"])) {
             $this->errors[] = "Please enter your password";
-        } elseif (!empty($_POST['username']) && !empty($_POST['password'])) {
+        } elseif (!empty($_POST["username"]) && !empty($_POST["password"])) {
             // clear user input
-            $username = htmlspecialchars($_POST["username"]);
-            $password = md5(htmlspecialchars($_POST["password"]));
+            $this->name = htmlspecialchars($_POST["username"]);
+            $password   = md5(htmlspecialchars($_POST["password"]));
             
             // create database connection
             $this->dbConnection = new mysqli(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME);
@@ -51,21 +58,22 @@ class Login
             if (!$this->dbConnection->connect_errno) {
                 // db query
                 $sql = $this->dbConnection->prepare("SELECT name, password FROM users WHERE name = ? and password = ?");
-                $sql->bind_param("ss", $username, $password);
+                $sql->bind_param("ss", $this->name, $password);
                 
                 
-                $result = $sql->execute();
+                $sql->execute();
                 $sql->store_result(); // binds the last given result to the $sql object
                 
                 if ($sql->num_rows == 1) { // successfull login
-                    $_SESSION['user_name']          = $username;
-                    $_SESSION['user_login_status']  = 1;
+                    $_SESSION["user"]               = $this;
+                    $_SESSION["user_login_status"]  = 1;
                 } else {
-                    $_SESSION['user_login_status']  = 0;
+                    $_SESSION["user_login_status"]  = 0;
                     $this->errors[]                 = "wrong username / password";
                 }
                 
-                #echo $sql->num_rows;
+                $this->dbConnection->close();
+                # $sql->num_rows;
                 
             } else {
                 // @TODO custom error message depending on the error type
@@ -88,12 +96,35 @@ class Login
     *
     * @returns boolean
     */
-    public function isUserLoggedIn()
+    public function isLoggedIn()
     {
-        if (isset($_SESSION['user_login_status']) AND $_SESSION['user_login_status'] == 1) {
+        if (isset($_SESSION["user_login_status"]) AND $_SESSION["user_login_status"] == 1) {
             return true;
         }
         // default return
         return false;
+    }
+    
+    public function getName() 
+    {
+        return $this->name;
+    }
+    
+    public function getRssFeeds() 
+    {
+        
+        $this->dbConnection = new mysqli(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME);
+            
+            if (!$this->dbConnection->connect_errno) {
+                // db query
+                $result = $this->dbConnection->query("SELECT * FROM jadu.feeds;");
+                
+                $this->dbConnection->close();
+                # $sql->num_rows;
+                
+            } else {
+                // @TODO custom error message depending on the error type
+                $this->errors[] = "Could not connect to Database " . DB_NAME . " at "  . DB_HOST ;
+            }
     }
 }

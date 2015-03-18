@@ -1,7 +1,7 @@
 <div class="container">
     <div class="col-md-6">
-        <div class="row">Welcome <?php echo $_SESSION['user_name'] ?>!
-            <a href='index.php?logout'>logout</a>
+        <div class="row">Welcome <?php echo $user->getName(); ?>!
+            <a href="index.php?logout">logout</a>
         </div>
     </div>
     
