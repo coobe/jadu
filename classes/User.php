@@ -44,7 +44,7 @@ class User
     
     public function __construct() 
     {
-        session_start();
+        #session_start();
         
         if (isset($_POST["login"])) {
             $this->login();
@@ -82,12 +82,11 @@ class User
                 /* fetch values */
                 while ($sql->fetch()) {
                     printf ("%s (%s)\n", $this->name, $this->isAdmin);
-                }
-                
-                $this->getRssFeeds();
+                }   
 
                 $sql->store_result(); // binds the last given result to the $sql object
                 if ($sql->num_rows == 1) { // successfull login
+                    $this->getRssFeeds();
                     $_SESSION["user"]               = $this;
                     $_SESSION["user_login_status"]  = 1;
                 } else {
