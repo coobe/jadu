@@ -1,18 +1,30 @@
-<?php
-// show errors
-if (isset($login)) {
-    if ($login->errors) {
-        foreach ($login->errors as $error) {
-            echo $error;
+<div class="container">
+    <div class="col-md-6 col-md-offset-4">
+        <h1>RSS Webapp</h1>
+    <?php
+    // show errors
+    if (isset($login)) {
+        if ($login->errors) {
+            foreach ($login->errors as $error) {
+                echo "<div class='row alert alert-danger'>" . $error . "</div>";
+            }
         }
     }
-}
-?>
-<!-- login form box -->
-<form method="post" action="index.php" name="loginform">
-    <label for="login_username">Username</label>
-    <input id="login_username" type="text" name="username" required />
-    <label for="login_password">Password</label>
-    <input id="login_password" type="password" name="password" autocomplete="off" required />
-    <input type="submit" name="login" value="Log in" />
-</form>
+    ?>
+    
+    <!-- login form -->
+        <form method="post" action="index.php" name="loginform">
+            <div class="row">
+                <label class="label label-default" for="login_username">Username</label>
+                <input id="login_username" type="text" name="username" required />
+            </div>
+            <div class="row">
+                <label class="label label-default"  for="login_password">Password</label>
+                <input id="login_password" type="password" name="password" autocomplete="off" required />
+            </div>
+            <div class="row">
+                <input class="btn btn-primary" type="submit" name="login" value="login" />
+            </div>
+        </form>
+    </div>
+</div>

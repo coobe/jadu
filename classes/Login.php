@@ -26,10 +26,14 @@ class Login
         
         if (isset($_POST["login"])) {
             $this->login();
+        } elseif (isset($_GET["logout"])) {
+            $this->logout();
         }
     }
     
-    
+    /**
+    * checks for correct login data
+    */ 
     private function login() 
     {
         if (empty($_POST['username'])) {
@@ -38,8 +42,8 @@ class Login
             $this->errors[] = "Please enter your password";
         } elseif (!empty($_POST['username']) && !empty($_POST['password'])) {
             // clear user input
-            $username = $_POST["username"];
-            $password = $_POST["password"];
+            $username = htmlspecialchars($_POST["username"]);
+            $password = md5(htmlspecialchars($_POST["password"]));
             
             // create database connection
             $this->dbConnection = new mysqli(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME);
@@ -51,7 +55,17 @@ class Login
                 
                 
                 $result = $sql->execute();
-                var_dump($result);
+                $sql->store_result(); // binds the last given result to the $sql object
+                
+                if ($sql->num_rows == 1) { // successfull login
+                    $_SESSION['user_name']          = $username;
+                    $_SESSION['user_login_status']  = 1;
+                } else {
+                    $_SESSION['user_login_status']  = 0;
+                    $this->errors[]                 = "wrong username / password";
+                }
+                
+                #echo $sql->num_rows;
                 
             } else {
                 // @TODO custom error message depending on the error type
@@ -60,7 +74,20 @@ class Login
         }
     }
     
+    /**
+    * ends the current session
+    */
+    public function logout()
+    {
+        $_SESSION = array();
+        session_destroy();
+    }
     
+    /**
+    * checks if a user is logged in (returns true/false)
+    *
+    * @returns boolean
+    */
     public function isUserLoggedIn()
     {
         if (isset($_SESSION['user_login_status']) AND $_SESSION['user_login_status'] == 1) {
