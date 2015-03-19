@@ -11,8 +11,7 @@
  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap-theme.min.css">    
-    
-<script src="public/js/dashboard.js"></script>    
+   
 <style type="text/css">
     body {
         background-color: #1D2A33
@@ -35,6 +34,24 @@
     .alert-danger {
         max-width: 260px;
         text-align: center;
+    }
+    
+    
+    .btn-add-feed {
+        margin-left: 25px;
+        float: right;
+    }
+    
+    .modal-dialog .row .label {
+        line-height: 2 !important;
+    }
+    
+    .modal-dialog input {
+        margin-left: 20px;
+    }
+    
+    .ui-dialog-titlebar-close {
+        visibility: hidden;
     }
     
 </style>

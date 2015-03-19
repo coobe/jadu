@@ -12,12 +12,16 @@ class FeedController extends AbstractController
     {
         session_start();
         $this->user = $_SESSION["user"];
-        
-        $feedId = $request["feed"];
-        
+
         switch ($request["method"]) {
             case "delete":
+                $feedId     = $request["feed"];
                 $this->delete($feedId);
+            break;
+            case "add":
+                $feedName   = $request["feed_name"];
+                $feedUrl    = $request["feed_url"];
+                $this->add($feedName, $feedUrl);
             break;
             default: 
                 echo "DEFAULT";
@@ -35,44 +39,36 @@ class FeedController extends AbstractController
             $result = $this->dbConnection->query("DELETE FROM jadu.feeds WHERE id = " . $pFeedId . ";") or die("a mysql error has occured: " . $this->dbConnection->errno);
                 
         } else {
-            // @TODO custom error message depending on the error type
             $this->errors[] = "Could not connect to Database " . DB_NAME . " at "  . DB_HOST ;
         }
         
+        $this->dbConnection->close();
+        
         include("./views/rss_table.php");
         exit();
-     
-            
-            /*
-            <div class="col-md-8 col-md-offset-2">
-        <table id="rss-table" class="table table-hover">
-            <caption>Your RSS Feeds</caption>
-            <tbody>
-                <tr>
-                    <th class="hidden">Id</th>
-                    <th>Url</th>
-                    <th>Name</th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                </tr>
-                <?php
-                foreach ($user->getRssFeeds() as $feed) { ?>
-                    <tr>
-                        <td class="hidden"><?php echo $feed[0] ?></td>
-                        <td><?php echo $feed[1] ?></td>
-                        <td><?php echo $feed[2] ?></td>
-                        <td><button class="btn-delete btn-danger" feed-id="<?php echo $feed[0]; ?>">delete</button></td>
-                        <td><button class="btn-primary">edit</button></td>
-                        <td><button class="btn-success">activate</button></td>
-                    </tr>
-                <?php
-                }
-                ?>
-                
-                
-            </tbody>
-        </table>
-    </div>*/
     }
+    
+    private function add($pName, $pUrl)
+    {
+        // create database connection
+        $this->dbConnection = new mysqli(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME);
+            
+        if (!$this->dbConnection->connect_errno) {
+            // insert new feed
+            $sql = $this->dbConnection->prepare("INSERT INTO jadu.feeds(display_name, url) VALUES(?, ?);") or die("a mysql error has occured: " . $this->dbConnection->errno);
+            $sql->bind_param("ss", $pName, $pUrl);
+            $sql->execute();
+            
+            $this->dbConnection->query("INSERT INTO jadu.users_feeds(user_id, feed_id) VALUES(" . $this->user->getUserId() . ", LAST_INSERT_ID());") or die("a mysql error has occured: " . $this->dbConnection->errno); 
+        } else {
+            $this->errors[] = "Could not connect to Database " . DB_NAME . " at "  . DB_HOST ;
+            exit();
+        }
+        
+        $this->dbConnection->commit();
+        
+        include("./views/rss_table.php");
+        exit();
+    }
+    
 }
