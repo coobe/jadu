@@ -13,6 +13,8 @@ class FeedController extends AbstractController
 {
     private $user;
     private $dbConnection;
+    private $feedUrl;
+    private $feedName;
     
     /**
     * delegates request to the according internal method
@@ -30,15 +32,19 @@ class FeedController extends AbstractController
             case "delete":
                 $feedId     = $pRequest["feed"];
                 $this->delete($feedId);
-            break;
+                break;
             case "add":
                 $feedName   = $pRequest["feed_name"];
                 $feedUrl    = $pRequest["feed_url"];
                 $this->add($feedName, $feedUrl);
-            break;
+                break;
+            case "read":
+                $feedId     = $pRequest["feed"];
+                $this->read($feedId);
+                break;
             default: 
                 echo "Wrong method supplied at FeedController";
-            break;
+                break;
         }
     }
     
@@ -93,6 +99,50 @@ class FeedController extends AbstractController
         
         include("./views/rss_table.php");
         exit();
+    }
+    
+    private function read($pFeedId) 
+    {
+        // create database connection
+        $this->dbConnection = new mysqli(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME);
+        
+        $sql = $this->dbConnection->prepare("SELECT url, display_name FROM feeds WHERE id = ?") or die("a mysql error has occured: " . $this->dbConnection->errno); 
+        $sql->bind_param("s", $pFeedId);
+        $sql->execute();
+        
+        /* bind result variables */
+        $sql->bind_result($this->feedUrl, $this->feedName);
+        $sql->fetch();
+        
+        $feed = simplexml_load_file($this->feedUrl);        
+        
+        //$feed = simplexml_load_file("http://newsrss.bbc.co.uk/rss/newsonline_uk_edition/front_page/rss.xml");
+        $feedArray = array();
+        foreach($feed->channel->item as $story){
+            $storyArray = array (
+                                  'title'   => strip_tags($story->title),
+                                  'desc'    => strip_tags($story->description),
+                                  'link'    => strip_tags($story->link),
+                                  'date'    => strip_tags($story->date)
+            );
+
+            array_push($feedArray, $storyArray);
+        }
+        
+        // this is an exception for rss feeds wich have no items below the channel tag but on the same level
+        foreach($feed->item as $story){
+            $storyArray = array (
+                                  'title'   => strip_tags($story->title),
+                                  'desc'    => strip_tags($story->description),
+                                  'link'    => strip_tags($story->link),
+                                  'date'    => strip_tags($story->date)
+            );
+
+            array_push($feedArray, $storyArray);
+        }
+        
+        $feedName = $this->feedName;
+        include("./views/read_feed.php");
     }
     
 }

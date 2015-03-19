@@ -17,6 +17,10 @@
         background-color: #1D2A33
     }
     
+    a:visited {
+        color: #000000 !important;
+    }
+    
     table {
         margin-top: 50px;
     }
@@ -59,8 +63,20 @@
         visibility: hidden;
     }
     
+    .no-title .ui-dialog-titlebar {
+        display: none;
+    }
+    
     .rss-row {
         cursor: pointer;
+    }
+    
+    .label:hover {
+        color: red !important;
+    }
+    
+    #read-feed-dialog h3 {
+        margin-top: 15px;
     }
     
     #message-box {
@@ -69,6 +85,38 @@
         width: 300px;
         left: 0;
         right: 0;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    #overlay {
+        background-color: rgba(0, 0, 0, 0.8);
+        z-index: 999;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: none;
+    }
+    
+    #loading-indicator {
+        background:rgba(0,0,0,0.3);
+        width:100%;
+        height:100%;
+        z-index: 9999;
+        position: absolute;
+        text-align: center;
+        left: 0;
+        right: 0;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    #loading-indicator img {
+        position: absolute;
+        text-align: center;
+        width: auto;
+        left: 10;
+        right: 10;
         margin-left: auto;
         margin-right: auto;
     }
@@ -108,6 +156,6 @@ if ($user->isLoggedIn() == true) {
     include("views/login_form.php");
 }
 ?>
-    
+  
 </body>
 </html>

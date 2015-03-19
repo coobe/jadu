@@ -3,6 +3,47 @@ $(document).ready(function() {
     // hide message box initially
     $("#message-box").hide();
     
+    // bind jquery dialog widget to read-feed-dialog
+    var readFeedDialog = $("#read-feed-dialog").dialog({
+        dialogClass: "no-title",
+        modal: true,
+        autoOpen: false,  
+        resizable: false,
+        draggable: false,
+        width: 800,
+        height: 600,
+        position: {
+            my: "center",
+            at: "center",
+            of: ".container" 
+        }
+    });
+    
+    // have a nice loading screen during ajax calls
+    var loadingModal = $("#loading-modal").dialog({
+        dialogClass: "no-title",
+        modal: true,
+        autoOpen: false,  
+        resizable: false,
+        draggable: false,
+        width: 800,
+        height: 600,
+        position: {
+            my: "center",
+            at: "center",
+            of: ".container" 
+        }
+    });
+    
+    $(document).ajaxSend(function(event, request, settings) {
+        $('#loading-indicator').show();
+
+    });
+
+    $(document).ajaxComplete(function(event, request, settings) {
+        $('#loading-indicator').hide();
+    });
+    
     // rss row click event handler
     $(".rss-row").unbind().click(function(e) {  
         // prevent delete buttons from firing this event
@@ -11,7 +52,14 @@ $(document).ready(function() {
         }
         
         var feedId = $(this).attr("feed-id");
-        console.log("Clicked feed id: " + feedId);
+        $.ajax({
+            method: "post",
+            url: "ajax_handler.php",
+            data: {feed: feedId, target: "feed", method: "read"}
+        }).done(function(response) {
+            $("#read-feed-dialog").html(response);
+            $("#read-feed-dialog").dialog("open");
+        });
     });
     
     // event handler for the delete feed button
@@ -28,12 +76,12 @@ $(document).ready(function() {
                 url: "ajax_handler.php",
                 data: {feed: feed_id, target: "feed", method: "delete"}
             }).done(function(response) {
-               afterAjaxTasks("#add-feed-dialog", "deleted RSS Feed", "#rss-table", response);
+               afterAjaxTasks("#read-feed-dialog", "deleted RSS Feed", "#rss-table", response);
             });
         }
     });
     
-    // bind jquery dialog widget to div
+    // bind jquery dialog widget to add-feed-dialog
     var addFeedDialog = $("#add-feed-dialog").dialog({
         dialogClass: "no-close",
         modal: true,
@@ -50,7 +98,7 @@ $(document).ready(function() {
     
     // event handler for the add feed button
     $(".btn-add-feed" ).unbind().click(function(e) {
-        $("#add-feed-dialog").dialog( "open" );
+        $("#add-feed-dialog").dialog("open");
     });
     
     // confirmation to add a feed
@@ -72,17 +120,12 @@ $(document).ready(function() {
         }        
     });
     
-    // confirmation to add a feed
+    // cancel while adding a feed
     $("#modal-add-feed-cancel").unbind().click(function(e) {
             e.preventDefault(); // prevent notification
             $("#feed-name").val("");
             $("#feed-url").val("");
             $("#add-feed-dialog").dialog("close")
-    });
-    
-    // center dialogs after resizing window
-    $(window).resize(function() {
-        $("#add-feed-dialog").dialog("option", "position", {my: "center", at: "center", of: ".container"});
     });
     
     // center dialogs after resizing window

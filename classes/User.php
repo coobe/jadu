@@ -75,7 +75,6 @@ class User
                 $sql = $this->dbConnection->prepare("SELECT id, name, is_admin FROM users WHERE name = ? and password = ?");
                 $sql->bind_param("ss", $this->name, $password);
                 
-                
                 $sql->execute();
                 /* bind result variables */
                 $sql->bind_result($this->userId, $this->name, $this->isAdmin);
