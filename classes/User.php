@@ -1,7 +1,7 @@
 <?php 
 
 /**
-* Class for Login/Logout related logic
+* Class for User related logic
 *
 * @author Torsten Oppermann
 * @since 17.03.2015

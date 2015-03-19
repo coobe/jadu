@@ -3,14 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <title>jadu rss app</title>
+    
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap-theme.min.css">
+<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+    
+ <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap-theme.min.css">    
+    
 <script src="public/js/dashboard.js"></script>    
 <style type="text/css">
     body {
         background-color: #1D2A33
+    }
+    
+    table {
+        margin-top: 50px;
     }
     
     .container {
@@ -39,8 +48,6 @@
 * @author Torsten Oppermann
 * @since 17.03.2015
 */
-
-
 
 // enforce https
 if($_SERVER["HTTPS"] != "on") {
