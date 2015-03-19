@@ -39,11 +39,16 @@
     
     .btn-add-feed {
         margin-left: 25px;
+        margin-right: 10px;
+        float: right;
+    }
+    
+    .btn-delete-feed {
         float: right;
     }
     
     .modal-dialog .row .label {
-        line-height: 2 !important;
+        line-height: 2;
     }
     
     .modal-dialog input {
@@ -52,6 +57,20 @@
     
     .ui-dialog-titlebar-close {
         visibility: hidden;
+    }
+    
+    .rss-row {
+        cursor: pointer;
+    }
+    
+    #message-box {
+        position: absolute;
+        text-align: center;
+        width: 300px;
+        left: 0;
+        right: 0;
+        margin-left: auto;
+        margin-right: auto;
     }
     
 </style>

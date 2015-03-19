@@ -1,5 +1,11 @@
 <div class="container">
-    <div class="col-md-6">
+    <div>
+        <div class="row alert alert-success col-md-offset-6" id="message-box">
+            <!--
+            <button type="button" class="close" data-dismiss="alert">x</button>
+            -->
+            MESSAGES APPEAR HERE
+        </div>
         <div class="row">Welcome <?php echo $user->getName(); ?>!
             <a href="index.php?logout">logout</a>
         </div>

@@ -1,5 +1,19 @@
 $(document).ready(function() {
-   
+    
+    // hide message box initially
+    $("#message-box").hide();
+    
+    // rss row click event handler
+    $(".rss-row").unbind().click(function(e) {  
+        // prevent delete buttons from firing this event
+        if (e.target.nodeName === "BUTTON") {
+            return;
+        }
+        
+        var feedId = $(this).attr("feed-id");
+        console.log("Clicked feed id: " + feedId);
+    });
+    
     // event handler for the delete feed button
     $(".btn-delete-feed").unbind().click(function(e) {
         // confirmation check
@@ -14,7 +28,7 @@ $(document).ready(function() {
                 url: "ajax_handler.php",
                 data: {feed: feed_id, target: "feed", method: "delete"}
             }).done(function(response) {
-               $("#rss-table").html(response); // update the feed table
+               afterAjaxTasks("#add-feed-dialog", "deleted RSS Feed", "#rss-table", response);
             });
         }
     });
@@ -53,8 +67,7 @@ $(document).ready(function() {
             }).done(function(response) {
                 $("#feed-name").val("");
                 $("#feed-url").val("");
-                $("#add-feed-dialog").dialog("close");
-                $("#rss-table").html(response); // update the feed table
+                afterAjaxTasks("#add-feed-dialog", "added new RSS Feed", "#rss-table", response);
             });     
         }        
     });
@@ -72,4 +85,22 @@ $(document).ready(function() {
         $("#add-feed-dialog").dialog("option", "position", {my: "center", at: "center", of: ".container"});
     });
     
+    // center dialogs after resizing window
+    $(window).resize(function() {
+        $("#add-feed-dialog").dialog("option", "position", {my: "center", at: "center", of: ".container"});
+    });
+    
+    // helper functions to avoid redundant code
+    
+    /*
+    * cleanse input fields, show message, render response
+    */
+    function afterAjaxTasks(dialogSelector, message, responseSelector, response) {
+        $(dialogSelector).dialog("close");
+        if (response) {
+            $(responseSelector).html(response); // update the dynamic content
+        };
+        $("#message-box").html(message);
+        $("#message-box").fadeIn(1400).fadeOut(1400);
+    }
 });
