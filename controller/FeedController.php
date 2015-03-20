@@ -149,6 +149,7 @@ class FeedController extends AbstractController
 
             $feedName = $this->feedName;
             include("./views/read_feed.php");   
+            exit();
         } else {
             $errorMessage = "could not parse feed at <b>" . $this->feedUrl . "</b>. Please check the URL";
             include("./views/error.php");
