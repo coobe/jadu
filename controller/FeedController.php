@@ -101,6 +101,11 @@ class FeedController extends AbstractController
         exit();
     }
     
+    /**
+    * read a given feed
+    * 
+    * @param $pFeedId
+    */
     private function read($pFeedId) 
     {
         // create database connection
