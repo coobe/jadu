@@ -4,8 +4,7 @@
 </script>
 
 
-<div id="read-feed-dialog" class="modal-dialog no-title">
-    <h3>Feeds from <?php echo (!isset($feedName) ? "null" : $feedName); ?></h3>    
+<div id="read-feed-dialog" class="modal-dialog no-title">   
 <?php 
 if (!isset($feedArray)) {
     exit();

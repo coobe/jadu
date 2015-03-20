@@ -9,8 +9,7 @@
             <input id="feed-url" type="text" name="feed-url" required />
         </div>
         <div class="row">
-            <button id="modal-add-feed" class="col-md-2 col-md-offset-3 btn btn-primary" name="add">Add</button>
-            <button id="modal-add-feed-cancel" class="col-md-2 col-md-offset-2  btn btn-danger" name="cancel">Cancel</button>
+            <button id="modal-add-feed" class="col-md-3 col-md-offset-4 btn btn-primary" name="add">Save</button>
         </div>
     </form>
 </div>

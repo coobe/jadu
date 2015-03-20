@@ -4,13 +4,14 @@
 <meta charset="UTF-8">
 <title>jadu rss app</title>
     
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>    
+<!-- bootstrap js MUST be loaded before jquery-ui ! -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>    
 <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
     
- <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap-theme.min.css">    
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap-theme.min.css">      
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
    
 <style type="text/css">
     body {
@@ -59,10 +60,6 @@
         margin-left: 20px;
     }
     
-    .ui-dialog-titlebar-close {
-        visibility: hidden;
-    }
-    
     .no-title .ui-dialog-titlebar {
         display: none;
     }
@@ -73,6 +70,21 @@
     
     .label:hover {
         color: red !important;
+    }
+    
+    .hide-scrollbar {
+        overflow: hidden;
+    }
+    
+    .error-message {
+        position: absolute;
+        text-align: center;
+        width: auto;
+        left: 0;
+        right: 0;
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 500px !important;
     }
     
     #read-feed-dialog h3 {
@@ -115,10 +127,11 @@
         position: absolute;
         text-align: center;
         width: auto;
-        left: 10;
-        right: 10;
+        left: 100;
+        right: 100;
         margin-left: auto;
         margin-right: auto;
+        margin-top: 140px;
     }
     
 </style>

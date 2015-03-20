@@ -114,35 +114,42 @@ class FeedController extends AbstractController
         $sql->bind_result($this->feedUrl, $this->feedName);
         $sql->fetch();
         
-        $feed = simplexml_load_file($this->feedUrl);        
+        $feed = @simplexml_load_file($this->feedUrl);  
         
-        //$feed = simplexml_load_file("http://newsrss.bbc.co.uk/rss/newsonline_uk_edition/front_page/rss.xml");
-        $feedArray = array();
-        foreach($feed->channel->item as $story){
-            $storyArray = array (
-                                  'title'   => strip_tags($story->title),
-                                  'desc'    => strip_tags($story->description),
-                                  'link'    => strip_tags($story->link),
-                                  'date'    => strip_tags($story->date)
-            );
+        if ($feed) {
+            //$feed = simplexml_load_file("http://newsrss.bbc.co.uk/rss/newsonline_uk_edition/front_page/rss.xml");
+            $feedArray = array();
+            foreach($feed->channel->item as $story){
+                $storyArray = array (
+                                      'title'   => strip_tags($story->title),
+                                      'desc'    => strip_tags($story->description),
+                                      'link'    => strip_tags($story->link),
+                                      'date'    => strip_tags($story->date)
+                );
 
-            array_push($feedArray, $storyArray);
+                array_push($feedArray, $storyArray);
+            }
+
+            // this is an exception for rss feeds wich have no items below the channel tag but on the same level
+            foreach($feed->item as $story){
+                $storyArray = array (
+                                      'title'   => strip_tags($story->title),
+                                      'desc'    => strip_tags($story->description),
+                                      'link'    => strip_tags($story->link),
+                                      'date'    => strip_tags($story->date)
+                );
+
+                array_push($feedArray, $storyArray);
+            }
+
+            $feedName = $this->feedName;
+            include("./views/read_feed.php");   
+        } else {
+            $errorMessage = "could not parse feed at <b>" . $this->feedUrl . "</b>. Please check the URL";
+            include("./views/error.php");
+            exit();
         }
         
-        // this is an exception for rss feeds wich have no items below the channel tag but on the same level
-        foreach($feed->item as $story){
-            $storyArray = array (
-                                  'title'   => strip_tags($story->title),
-                                  'desc'    => strip_tags($story->description),
-                                  'link'    => strip_tags($story->link),
-                                  'date'    => strip_tags($story->date)
-            );
-
-            array_push($feedArray, $storyArray);
-        }
-        
-        $feedName = $this->feedName;
-        include("./views/read_feed.php");
     }
     
 }

@@ -18,7 +18,7 @@
 
         // iterate over feeds of the user
         foreach ($user->getRssFeeds() as $feed) { ?>
-            <tr class="rss-row" feed-id="<?php echo $feed[0] ?>">
+            <tr class="rss-row" feed-id="<?php echo $feed[0] ?>" feed-name="<?php echo $feed[2] ?>">
                 <td><?php echo $feed[2] ?></td>
                 <td><?php echo $feed[1] ?></td>
                 <td><button class="btn-delete-feed btn-danger" feed-id="<?php echo $feed[0]; ?>">delete</button></td>

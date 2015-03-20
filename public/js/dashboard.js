@@ -5,23 +5,7 @@ $(document).ready(function() {
     
     // bind jquery dialog widget to read-feed-dialog
     var readFeedDialog = $("#read-feed-dialog").dialog({
-        dialogClass: "no-title",
-        modal: true,
-        autoOpen: false,  
-        resizable: false,
-        draggable: false,
-        width: 800,
-        height: 600,
-        position: {
-            my: "center",
-            at: "center",
-            of: ".container" 
-        }
-    });
-    
-    // have a nice loading screen during ajax calls
-    var loadingModal = $("#loading-modal").dialog({
-        dialogClass: "no-title",
+        //dialogClass: "no-title",
         modal: true,
         autoOpen: false,  
         resizable: false,
@@ -36,11 +20,13 @@ $(document).ready(function() {
     });
     
     $(document).ajaxSend(function(event, request, settings) {
+        $("body").addClass("hide-scrollbar");
         $('#loading-indicator').show();
 
     });
 
     $(document).ajaxComplete(function(event, request, settings) {
+        $("body").removeClass("hide-scrollbar");
         $('#loading-indicator').hide();
     });
     
@@ -51,13 +37,15 @@ $(document).ready(function() {
             return;
         }
         
-        var feedId = $(this).attr("feed-id");
+        var feedId      = $(this).attr("feed-id");
+        var feedName    = $(this).attr("feed-name");
         $.ajax({
             method: "post",
             url: "ajax_handler.php",
             data: {feed: feedId, target: "feed", method: "read"}
         }).done(function(response) {
             $("#read-feed-dialog").html(response);
+            $(".ui-dialog-title").html("Feeds from " + feedName);
             $("#read-feed-dialog").dialog("open");
         });
     });
@@ -98,6 +86,7 @@ $(document).ready(function() {
     
     // event handler for the add feed button
     $(".btn-add-feed" ).unbind().click(function(e) {
+        $(".ui-dialog-title").html("Add a new RSS Feed");
         $("#add-feed-dialog").dialog("open");
     });
     
