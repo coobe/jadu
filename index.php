@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <title>jadu rss app</title>
     
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>    
+<script src="public/js/jquery-1.11.2.min.js"></script>    
 <!-- bootstrap js MUST be loaded before jquery-ui ! -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>    
-<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+<script src="public/js/bootstrap.min.js"></script>    
+<script src="public/js/jquery-ui.min.js"></script>
     
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap-theme.min.css">      
-<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<link rel="stylesheet" href="public/css/bootstrap.min.css">
+<link rel="stylesheet" href="public/css/bootstrap-theme.min.css">      
+<link rel="stylesheet" href="public/css/jquery-ui.min.css">
 <link rel="stylesheet" href="public/css/custom.css">   
 
 </head>
