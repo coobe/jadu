@@ -29,17 +29,3 @@ foreach($feedArray as $currentFeed) { ?>
 ?>
     </div>
 </div>
-
-/*
-
-$storyArray = array (
-                                  'title' => $story->title,
-                                  'desc' => $story->description,
-                                  'link' => $story->link,
-                                  'date' => $story->date
-            );
-            
-            */
-
-
-

@@ -120,6 +120,7 @@ $(document).ready(function() {
     // center dialogs after resizing window
     $(window).resize(function() {
         $("#add-feed-dialog").dialog("option", "position", {my: "center", at: "center", of: ".container"});
+        $("#read-feed-dialog").dialog("option", "position", {my: "center", at: "center", of: ".container"});
     });
     
     // helper functions to avoid redundant code
