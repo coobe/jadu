@@ -1,5 +1,5 @@
 <?php
-require_once("config/db.php");
+require_once("../config/db.php");
 
 $dbConnection   = new mysqli(DB_HOST, DB_USERNAME, DB_PASSWORD);
 if ($dbConnection->connect_errno > 0) {
