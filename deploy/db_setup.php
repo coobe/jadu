@@ -1,6 +1,6 @@
 <?php
 // include db configuration
-require_once("config/db.php");
+require_once("../config/db.php");
 require_once("db_clean.php");
 
 $dbConnection   = new mysqli(DB_HOST, DB_USERNAME, DB_PASSWORD);

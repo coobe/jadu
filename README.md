@@ -3,7 +3,7 @@
 - requirements: apache webserver(php 5.x), mysql db
 - place project in the webroot
 - enter db credentials in config/db.php
-- execute db_setup before using the first time
+- execute deploy/db_setup before using the first time => Alternatively: Run SQL Script in deploy folder in your DBMS
 - after that there is now 1 User already available: dummy (pw:dummy)
 
 
