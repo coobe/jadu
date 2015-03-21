@@ -6,13 +6,7 @@
 * @since 21.03.2015
 */
 class User
-{
-    /**
-    * stores the db connection
-    * @var object 
-    */
-    private $dbConnection = null;
-    
+{    
     /**
     * @var int
     */
@@ -33,11 +27,13 @@ class User
     */
     private $feedArray = array(); 
        
+    
     /**
     * @param $pId, $pName, $pPassword
     */
     public function __construct($pId, $pName, $pPassword) 
     {
+        
         $this->userId   = $pId;
         $this->name     = $pName;
         $this->password = $pPassword;
@@ -50,18 +46,12 @@ class User
     public function getRssFeeds() 
     {
         $this->feedArray = array();
-        
-        $this->dbConnection = new mysqli(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME);    
-        if (!$this->dbConnection->connect_errno) {
-            
-            // db query
-            $result = $this->dbConnection->query("SELECT feeds.* FROM jadu.feeds "
-                                                   . " JOIN jadu.users_feeds ON users_feeds.feed_id = feeds.id "
-                                                   . " WHERE users_feeds.user_id = " . $this->userId . ";") or die("a mysql error has occured: " . $this->dbConnection->errno);
-            while ($row = $result->fetch_row()) {
+        $pdo             = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME, DB_USERNAME, DB_PASSWORD);
+        $sql             = $pdo->prepare("SELECT * FROM feeds JOIN users_feeds ON users_feeds.feed_id = feeds.id WHERE users_feeds.user_id = :userId");
+        if ($sql->execute(array(":userId" => $this->userId))) {
+            while($row = $sql->fetch()) {
                 $this->feedArray[] = $row;
             }
-                
         } else {
             $this->errors[] = "Could not connect to Database " . DB_NAME . " at "  . DB_HOST ;
         }

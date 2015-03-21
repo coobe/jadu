@@ -7,9 +7,9 @@
 * @since 18.03.2015
 */ 
 try {
-    $target    = $_POST['target'];
-    $className  = strtoupper($target) . 'Controller';
-    $fileName   = __DIR__ . '/controller/' . $className . '.php';
+    $target    = $_POST["target"];
+    $className  = strtoupper($target) . "Controller";
+    $fileName   = __DIR__ . "/controller/" . $className . ".php";
     require_once $fileName;
     
     $controller = new $className;

@@ -11,13 +11,7 @@ require_once("./config/db.php");
 * @since 17.03.2015
 */
 class UserController extends AjaxController
-{
-    /**
-    * stores the db connection
-    * @var object 
-    */
-    private $dbConnection = null;
-    
+{    
     /**
     * @var int
     */
@@ -89,15 +83,6 @@ class UserController extends AjaxController
     */
     public function register($name, $password)
     {
-        // create database connection
-        mysqli_report(MYSQLI_REPORT_STRICT); // enable exceptions
-        try {
-            $this->dbConnection = new mysqli(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME);
-        } catch (Exception $e) {
-            $errorMessage = "Could not connect to Database " . DB_NAME . " at "  . DB_HOST;
-            include("./view/error.php");
-        }
-        
         // check if username already exists
         $sql = $this->pdo->prepare("SELECT name FROM users WHERE name = :name");
         $userExists = false;
@@ -105,6 +90,9 @@ class UserController extends AjaxController
             while($row = $sql->fetch()) {
                 $userExists = true;
             }
+        } else {
+            $errorMessage = "Could not connect to Database " . DB_NAME . " at "  . DB_HOST;
+            include("./view/error.php");
         }
 
         if (!$userExists) {               
@@ -112,8 +100,10 @@ class UserController extends AjaxController
             $sql = $this->pdo->prepare("INSERT INTO users (name, password) VALUES(:name, :pw)");
             if ($sql->execute(array(":name" => $name, "pw" => md5($password)))) {
                 return true;
+            } else {
+                $errorMessage = "Could not connect to Database " . DB_NAME . " at "  . DB_HOST;
+                include("./view/error.php");
             }
-
         }
         
         return false;
@@ -129,34 +119,14 @@ class UserController extends AjaxController
         } elseif (empty($_POST["password"])) {
             $this->errors[] = "Please enter your password";
         } elseif (!empty($_POST["username"]) && !empty($_POST["password"])) {
-            
             $userName   = htmlspecialchars($_POST["username"]);
             $password   = md5(htmlspecialchars($_POST["password"]));
+            $sql        = $this->pdo->prepare("SELECT id, name FROM users WHERE name = :name and password = :password");
             
-            // create database connection
-            mysqli_report(MYSQLI_REPORT_STRICT); // enable exceptions
-            try {
-                $this->dbConnection = new mysqli(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME);
-            } catch (Exception $e) {
-                $errorMessage = "Could not connect to Database " . DB_NAME . " at "  . DB_HOST;
-                include("./view/error.php");
-            }
-            
-            // check login credentials
-            if ($this->dbConnection) {
-               
-                // db query
-                $sql = $this->dbConnection->prepare("SELECT id, name FROM users WHERE name = ? and password = ?");
-                $sql->bind_param("ss", $userName, $password);
-                $sql->execute();
-                $sql->store_result();
-                
-                // bind result variables
-                $sql->bind_result($this->userId, $this->userName);
-                $sql->fetch();
-                
-                if ($sql->num_rows == 1) { // successful login
-                    $this->user                     = new User($this->userId, $userName, $password);
+            if ($sql->execute(array(":name" => $userName, ":password" => $password))) {
+                $result = $sql->fetch();
+                if (!empty($result)) {
+                    $this->user                     = new User($result["id"], $result["name"], $password);
                     $this->user->getRssFeeds();
                     
                     $_SESSION["user"]               = $this->user;
@@ -166,7 +136,6 @@ class UserController extends AjaxController
                     $errorMessage                   = "wrong username or password";
                     include("./view/error.php");
                 }
-                
             }
         }
     }
@@ -181,7 +150,7 @@ class UserController extends AjaxController
     }
     
     /**
-    * checks if a user is logged in (returns true/false)
+    * checks if a user is logged in
     *
     * @returns boolean
     */

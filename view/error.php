@@ -1,6 +1,6 @@
 <script type="application/javascript">
     $(document).ready(function() {
-        $("#error-box").fadeIn(1800).fadeOut(1800);   
+        $("#error-box").fadeIn(1).fadeOut(5800);   
     });
 </script>
 

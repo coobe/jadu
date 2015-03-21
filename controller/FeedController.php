@@ -19,14 +19,20 @@ class FeedController extends AjaxController
     private $user;
 
     /**
-    * @var mysqli
+    * @var PDO
     */
-    private $dbConnection;
+    private $pdo;
     
     /**
     * @var Feed
     */
     private $feed;
+    
+    
+    public function __construct() 
+    {
+        $this->pdo = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME, DB_USERNAME, DB_PASSWORD);
+    }
     
     /**
     * delegates request to the according internal method
@@ -66,23 +72,14 @@ class FeedController extends AjaxController
     */
     private function delete($pFeedId)
     {
-        // create database connection
-        try {
-            $this->dbConnection = new mysqli(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME);
-        } catch (Exception $e) {
-            $errorMessage = "Could not connect to Database " . DB_NAME . " at "  . DB_HOST;
+        $sql = $this->pdo->prepare("DELETE FROM feeds WHERE id = :id");
+        if ($sql->execute(array(":id" => $pFeedId))) {
+                include("./view/rss_table.php");
+                exit();
+        } else {
+            $errorMessage = "Could not delete Entry at Database " . DB_NAME . " at "  . DB_HOST;
             include("./view/error.php");
         }
-            
-        if ($this->dbConnection) {
-            // db query
-            $result = $this->dbConnection->query("DELETE FROM jadu.feeds WHERE id = " . $pFeedId . ";");                
-        }
-        
-        $this->dbConnection->close();
-        
-        include("./view/rss_table.php");
-        exit();
     }
     
     /**
@@ -91,27 +88,17 @@ class FeedController extends AjaxController
     */
     private function add()
     {
-        // create database connection
-        try {
-            $this->dbConnection = new mysqli(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME);
-        } catch (Exception $e) {
-            $errorMessage = "Could not connect to Database " . DB_NAME . " at "  . DB_HOST;
+        $sql = $this->pdo->prepare("INSERT INTO jadu.feeds(display_name, url) VALUES(:name, :url);");
+        if (!$sql->execute(array(":name" => $this->feed->getName(), ":url" => $this->feed->getUrl()))) {
+            $errorMessage = "Could not Insert at Database " . DB_NAME . " at "  . DB_HOST;
             include("./view/error.php");
+        } else {
+            $sql = $this->pdo->prepare("INSERT INTO jadu.users_feeds(user_id, feed_id) VALUES(:id, LAST_INSERT_ID());");
+            if ($sql->execute(array(":id" => $this->user->getUserId()))) {
+                include("./view/rss_table.php");
+                exit();
+            }
         }
-            
-        if ($this->dbConnection) {
-            // insert new feed safely
-            $sql = $this->dbConnection->prepare("INSERT INTO jadu.feeds(display_name, url) VALUES(?, ?);");
-            $sql->bind_param("ss", $this->feed->getName(), $this->feed->getUrl());
-            $sql->execute();
-            
-            // update the xref table
-            $this->dbConnection->query("INSERT INTO jadu.users_feeds(user_id, feed_id) VALUES(" . $this->user->getUserId() . ", LAST_INSERT_ID());");
-            $this->dbConnection->commit();
-        }
-        
-        include("./view/rss_table.php");
-        exit();
     }
     
     /**
@@ -121,26 +108,10 @@ class FeedController extends AjaxController
     */
     private function read($pFeedId) 
     {
-        // create database connection
-        try {
-            $this->dbConnection = new mysqli(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME);
-        } catch (Exception $e) {
-            $errorMessage = "Could not connect to Database " . DB_NAME . " at "  . DB_HOST;
-            include("./view/error.php");
-        };
-        
-        if($this->dbConnection) {
-            $sql = $this->dbConnection->prepare("SELECT display_name, url FROM feeds WHERE id = ?"); 
-            $sql->bind_param("s", $pFeedId);
-            $sql->execute();
-
-            // bind result variables        
-            $sql->bind_result($feedName, $feedUrl);
-            $sql->fetch();
-
-            $this->feed = new Feed($feedName, $feedUrl);
-
-            // parse feed url; warnings must be suppressed
+        $sql = $this->pdo->prepare("SELECT display_name, url FROM feeds WHERE id = :id");
+        if ($sql->execute(array(":id" => $pFeedId))) {
+            $result  = $sql->fetch();
+            $this->feed = new Feed($result["display_name"], $result["url"]);
             $feedXML = @simplexml_load_file($this->feed->getUrl());  
 
             if ($feedXML) {
@@ -162,7 +133,11 @@ class FeedController extends AjaxController
                 $errorMessage = "could not parse feed at <b>" . $this->feed->getUrl() . "</b>. Please check the URL";
                 include("./view/error.php");
                 exit();
-            } 
+            }
+            
+        } else {
+            $errorMessage = "Could not read Feed at " . DB_NAME . " at "  . DB_HOST;
+            include("./view/error.php");
         }
     }
 }
