@@ -14,7 +14,10 @@
             </div>
             <div class="row">
                 <input class="btn btn-primary" type="submit" name="login" value="login" />
+                <a href="#" id="register-link" class="btn btn-xs btn-link">register</a>
             </div>
         </form>
     </div>
 </div>
+
+<?php include("register_user.php"); ?>

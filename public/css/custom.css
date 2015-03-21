@@ -2,8 +2,8 @@ body {
     background-color: #1D2A33
 }
 
-a:visited {
-    color: #000000 !important;
+a.label:visited {
+    color: black;
 }
 
 table {
@@ -52,15 +52,11 @@ table {
     cursor: pointer;
 }
 
-.label:hover {
-    color: red !important;
-}
-
 .hide-scrollbar {
     overflow: hidden;
 }
 
-.error-message {
+.message {
     position: absolute;
     text-align: center;
     width: auto;
@@ -69,6 +65,14 @@ table {
     margin-left: auto;
     margin-right: auto;
     max-width: 500px !important;
+}
+
+.error-message-small {
+    text-align: center;
+    width: auto;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 250px !important;
 }
 
 #read-feed-dialog h3 {

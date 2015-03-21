@@ -1,5 +1,7 @@
 <?php 
 require_once("model/User.php");
+require_once("AjaxController.php");
+require_once("./config/db.php");
 
 /**
 * Controller Class for User Objects
@@ -8,7 +10,7 @@ require_once("model/User.php");
 * @author Torsten Oppermann
 * @since 17.03.2015
 */
-class UserController
+class UserController extends AjaxController
 {
     /**
     * stores the db connection
@@ -47,14 +49,74 @@ class UserController
     */
     private $user;
     
+    private $pdo;
     
     public function __construct() 
     {        
+        $this->pdo = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME, DB_USERNAME, DB_PASSWORD);
+        
         if (isset($_POST["login"])) {
             $this->login();
         } elseif (isset($_GET["logout"])) {
             $this->logout();
         }
+    }
+    
+    /**
+    * ajax handling
+    */
+    public function execute($pRequest)
+    {
+        // determine the correct internal method
+        switch ($pRequest["method"]) {
+            case "register":
+                $name           = $pRequest["name"];
+                $password       = $pRequest["pw"];
+                if (!$this->register($name, $password)) {
+                    return 1; // return error flag
+                }
+                break;
+            default: 
+                echo "Wrong method supplied at UserController";
+                break;
+        }
+    }
+    
+    /**
+    * register a user
+    *
+    * @returns boolean
+    */
+    public function register($name, $password)
+    {
+        // create database connection
+        mysqli_report(MYSQLI_REPORT_STRICT); // enable exceptions
+        try {
+            $this->dbConnection = new mysqli(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME);
+        } catch (Exception $e) {
+            $errorMessage = "Could not connect to Database " . DB_NAME . " at "  . DB_HOST;
+            include("./view/error.php");
+        }
+        
+        // check if username already exists
+        $sql = $this->pdo->prepare("SELECT name FROM users WHERE name = :name");
+        $userExists = false;
+        if ($sql->execute(array(":name" => $name))) {
+            while($row = $sql->fetch()) {
+                $userExists = true;
+            }
+        }
+
+        if (!$userExists) {               
+            // user does not exist go ahead and save user        
+            $sql = $this->pdo->prepare("INSERT INTO users (name, password) VALUES(:name, :pw)");
+            if ($sql->execute(array(":name" => $name, "pw" => md5($password)))) {
+                return true;
+            }
+
+        }
+        
+        return false;
     }
     
     /**
@@ -79,7 +141,6 @@ class UserController
                 $errorMessage = "Could not connect to Database " . DB_NAME . " at "  . DB_HOST;
                 include("./view/error.php");
             }
-            
             
             // check login credentials
             if ($this->dbConnection) {
