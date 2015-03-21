@@ -1,7 +1,9 @@
 <?php
-require("AbstractController.php");
+require("AjaxController.php");
 require("./config/db.php");
-require("./classes/User.php");
+require("UserController.php");
+require("model/Story.php");
+require("model/Feed.php");
 
 /**
 * Handles ajax requests regarding Feeds
@@ -9,12 +11,22 @@ require("./classes/User.php");
 * @author Torsten Oppermann
 * @since 19.03.2015
 */
-class FeedController extends AbstractController
+class FeedController extends AjaxController
 {
+    /**
+    * @var User
+    */ 
     private $user;
+
+    /**
+    * @var mysqli
+    */
     private $dbConnection;
-    private $feedUrl;
-    private $feedName;
+    
+    /**
+    * @var Feed
+    */
+    private $feed;
     
     /**
     * delegates request to the according internal method
@@ -34,9 +46,8 @@ class FeedController extends AbstractController
                 $this->delete($feedId);
                 break;
             case "add":
-                $feedName   = $pRequest["feed_name"];
-                $feedUrl    = $pRequest["feed_url"];
-                $this->add($feedName, $feedUrl);
+                $this->feed = new Feed($pRequest["feed_name"], $pRequest["feed_url"]);
+                $this->add();
                 break;
             case "read":
                 $feedId     = $pRequest["feed"];
@@ -56,106 +67,102 @@ class FeedController extends AbstractController
     private function delete($pFeedId)
     {
         // create database connection
-        $this->dbConnection = new mysqli(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME);
+        try {
+            $this->dbConnection = new mysqli(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME);
+        } catch (Exception $e) {
+            $errorMessage = "Could not connect to Database " . DB_NAME . " at "  . DB_HOST;
+            include("./view/error.php");
+        }
             
-        if (!$this->dbConnection->connect_errno) {
+        if ($this->dbConnection) {
             // db query
-            $result = $this->dbConnection->query("DELETE FROM jadu.feeds WHERE id = " . $pFeedId . ";") or die("a mysql error has occured: " . $this->dbConnection->errno);
-                
-        } else {
-            $this->errors[] = "Could not connect to Database " . DB_NAME . " at "  . DB_HOST ;
+            $result = $this->dbConnection->query("DELETE FROM jadu.feeds WHERE id = " . $pFeedId . ";");                
         }
         
         $this->dbConnection->close();
         
-        include("./views/rss_table.php");
+        include("./view/rss_table.php");
         exit();
     }
     
     /**
-    * add a new feed and return the updated table
+    * add a new feed and return the updated table and render the feed table
     *
-    * @param $pName, $pUrl 
     */
-    private function add($pName, $pUrl)
+    private function add()
     {
         // create database connection
-        $this->dbConnection = new mysqli(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME);
+        try {
+            $this->dbConnection = new mysqli(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME);
+        } catch (Exception $e) {
+            $errorMessage = "Could not connect to Database " . DB_NAME . " at "  . DB_HOST;
+            include("./view/error.php");
+        }
             
-        if (!$this->dbConnection->connect_errno) {
+        if ($this->dbConnection) {
             // insert new feed safely
-            $sql = $this->dbConnection->prepare("INSERT INTO jadu.feeds(display_name, url) VALUES(?, ?);") or die("a mysql error has occured: " . $this->dbConnection->errno);
-            $sql->bind_param("ss", $pName, $pUrl);
+            $sql = $this->dbConnection->prepare("INSERT INTO jadu.feeds(display_name, url) VALUES(?, ?);");
+            $sql->bind_param("ss", $this->feed->getName(), $this->feed->getUrl());
             $sql->execute();
             
             // update the xref table
-            $this->dbConnection->query("INSERT INTO jadu.users_feeds(user_id, feed_id) VALUES(" . $this->user->getUserId() . ", LAST_INSERT_ID());") or die("a mysql error has occured: " . $this->dbConnection->errno); 
-        } else {
-            $this->errors[] = "Could not connect to Database " . DB_NAME . " at "  . DB_HOST ;
-            exit();
+            $this->dbConnection->query("INSERT INTO jadu.users_feeds(user_id, feed_id) VALUES(" . $this->user->getUserId() . ", LAST_INSERT_ID());");
+            $this->dbConnection->commit();
         }
         
-        $this->dbConnection->commit();
-        
-        include("./views/rss_table.php");
+        include("./view/rss_table.php");
         exit();
     }
     
     /**
-    * read a given feed
+    * read a given feed and render the feed dialog
     * 
     * @param $pFeedId
     */
     private function read($pFeedId) 
     {
         // create database connection
-        $this->dbConnection = new mysqli(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME);
+        try {
+            $this->dbConnection = new mysqli(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME);
+        } catch (Exception $e) {
+            $errorMessage = "Could not connect to Database " . DB_NAME . " at "  . DB_HOST;
+            include("./view/error.php");
+        };
         
-        $sql = $this->dbConnection->prepare("SELECT url, display_name FROM feeds WHERE id = ?") or die("a mysql error has occured: " . $this->dbConnection->errno); 
-        $sql->bind_param("s", $pFeedId);
-        $sql->execute();
-        
-        /* bind result variables */
-        $sql->bind_result($this->feedUrl, $this->feedName);
-        $sql->fetch();
-        
-        $feed = @simplexml_load_file($this->feedUrl);  
-        
-        if ($feed) {
-            //$feed = simplexml_load_file("http://newsrss.bbc.co.uk/rss/newsonline_uk_edition/front_page/rss.xml");
-            $feedArray = array();
-            foreach($feed->channel->item as $story){
-                $storyArray = array (
-                                      'title'   => strip_tags($story->title),
-                                      'desc'    => strip_tags($story->description),
-                                      'link'    => strip_tags($story->link),
-                                      'date'    => strip_tags($story->date)
-                );
+        if($this->dbConnection) {
+            $sql = $this->dbConnection->prepare("SELECT display_name, url FROM feeds WHERE id = ?"); 
+            $sql->bind_param("s", $pFeedId);
+            $sql->execute();
 
-                array_push($feedArray, $storyArray);
-            }
+            // bind result variables        
+            $sql->bind_result($feedName, $feedUrl);
+            $sql->fetch();
 
-            // this is an exception for rss feeds wich have no items below the channel tag but on the same level
-            foreach($feed->item as $story){
-                $storyArray = array (
-                                      'title'   => strip_tags($story->title),
-                                      'desc'    => strip_tags($story->description),
-                                      'link'    => strip_tags($story->link),
-                                      'date'    => strip_tags($story->date)
-                );
+            $this->feed = new Feed($feedName, $feedUrl);
 
-                array_push($feedArray, $storyArray);
-            }
+            // parse feed url; warnings must be suppressed
+            $feedXML = @simplexml_load_file($this->feed->getUrl());  
 
-            $feedName = $this->feedName;
-            include("./views/read_feed.php");   
-            exit();
-        } else {
-            $errorMessage = "could not parse feed at <b>" . $this->feedUrl . "</b>. Please check the URL";
-            include("./views/error.php");
-            exit();
+            if ($feedXML) {
+                foreach($feedXML->channel->item as $currentStory) {
+                    $story = new Story(strip_tags($currentStory->title), strip_tags($currentStory->description), strip_tags($currentStory->link), strip_tags($currentStory->date));
+                    $this->feed->addStory($story);
+                }
+
+                // this is an exception for rss feeds wich have no items below the channel tag but on the same level
+                foreach($feedXML->item as $currentStory) {
+                    $story = new Story(strip_tags($currentStory->title), strip_tags($currentStory->description), strip_tags($currentStory->link), strip_tags($currentStory->date));
+                    $this->feed->addStory($story);
+                }
+
+                $feed = $this->feed;
+                include("./view/read_feed.php");   
+                exit();
+            } else {
+                $errorMessage = "could not parse feed at <b>" . $this->feed->getUrl() . "</b>. Please check the URL";
+                include("./view/error.php");
+                exit();
+            } 
         }
-        
     }
-    
 }

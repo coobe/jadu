@@ -1,18 +1,8 @@
 <div class="container">
     <div class="col-md-6 col-md-offset-4">
         <h1>RSS Webapp</h1>
-    <?php
-    // show errors
-    if (isset($user)) {
-        if ($user->errors) {
-            foreach ($user->errors as $error) {
-                echo "<div class='row alert alert-danger'>" . $error . "</div>";
-            }
-        }
-    }
-    ?>
     
-    <!-- login form -->
+        <!-- login form -->
         <form method="post" action="index.php" name="loginform">
             <div class="row">
                 <label class="label label-default" for="login_username">Username</label>

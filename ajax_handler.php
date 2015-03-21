@@ -1,5 +1,11 @@
 <?php
 
+/**
+* Dynamically calls an AJAX enabled Controller
+*
+* @author Torsten Oppermann
+* @since 18.03.2015
+*/ 
 try {
     $target    = $_POST['target'];
     $className  = strtoupper($target) . 'Controller';
@@ -10,6 +16,7 @@ try {
     $response   = $controller->execute($_REQUEST);
     echo json_encode($response);
 } catch (Exception $e) {
-    header("404 not found");
+    $errorMessage = "AJAX handler error";
+    include("./view/error.php");
     exit();
 }

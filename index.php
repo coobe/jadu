@@ -31,21 +31,19 @@ if($_SERVER["HTTPS"] != "on") {
     exit();
 }
 
-// include db configuration
 require_once("config/db.php");
+require_once("controller/UserController.php");
+require_once("model/User.php");
 
-// load classes
-require_once("classes/User.php");
 session_start();
 
-// check if user is logged in and render the appropriate view
-$user = new User();
-if ($user->isLoggedIn() == true) {
+$userController = new UserController();
+
+if ($userController->isLoggedIn() == true) {
     $user = $_SESSION["user"];
-    include("views/dashboard.php");
+    include("view/dashboard.php");
 } else {
-    $_SESSION['user'] = $user;
-    include("views/login_form.php");
+    include("view/login_form.php");
 }
 ?>
   

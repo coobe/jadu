@@ -13,7 +13,7 @@
         </tr>
         <?php
         // get the user object
-        require_once("./classes/User.php");
+        require_once("./model/User.php");
         $user = $_SESSION["user"];
 
         // iterate over feeds of the user
