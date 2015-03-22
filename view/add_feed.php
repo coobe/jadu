@@ -1,4 +1,4 @@
-<div id="add-feed-dialog" class="col-md-6 col-md-offset-4 modal-dialog" title="Add a new Feed" style="text-align: center;">
+<div id="add-feed-dialog" class="hidden col-md-6 col-md-offset-4 modal-dialog" title="Add a new Feed" style="text-align: center;">
    <form onsubmit="event.preventDefault();" style="margin: auto;">
         <div class="row">
             <label class="col-xs-3 col-xs-offset-2 label label-default">Name</label>

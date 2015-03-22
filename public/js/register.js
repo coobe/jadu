@@ -31,6 +31,7 @@ $(document).ready(function() {
         $("#user-name").val("");
         $("#register-password").val("");
         $("#confirm-password").val("");
+        $("#register-user-dialog").removeClass("hidden");
         $("#register-user-dialog").dialog("open"); 
     });
 

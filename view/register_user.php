@@ -4,7 +4,7 @@
     <p>User was successfully created</p>
 </div>
 
-<div id="register-user-dialog" class="modal-dialog" title="Register a new User">
+<div id="register-user-dialog" class="hidden modal-dialog" title="Register a new User">
     <div id="register-error" class="row alert alert-danger error-message-small" style="display: none;">   
     </div>
    <form onsubmit="event.preventDefault();">

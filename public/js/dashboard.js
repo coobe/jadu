@@ -87,6 +87,7 @@ $(document).ready(function() {
     // event handler for the add feed button
     $(".btn-add-feed" ).unbind().click(function(e) {
         $(".ui-dialog-title").html("Add a new RSS Feed");
+        $("#add-feed-dialog").removeClass("hidden");
         $("#add-feed-dialog").dialog("open");
     });
     
