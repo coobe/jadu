@@ -46,7 +46,7 @@ $(document).ready(function() {
             return;
         }
         $("body").addClass("hide-scrollbar");
-            $('#loading-indicator').show();
+        $('#loading-indicator').show();
         var feedId      = $(this).attr("feed-id");
         var feedName    = $(this).attr("feed-name");
         $.ajax({
@@ -65,6 +65,9 @@ $(document).ready(function() {
     $(".btn-delete-feed").unbind().click(function(e) {
         // confirmation check
         var popupChoice = confirm("Do you really want to delete this feed ?");
+        
+        $("body").addClass("hide-scrollbar");
+        $('#loading-indicator').show();
         
         // make ajax call and delete the feed
         if (popupChoice) {
@@ -106,6 +109,9 @@ $(document).ready(function() {
     $("#modal-add-feed").unbind().click(function(e) {
         var feedName    = $("#feed-name").val();
         var feedUrl     = $("#feed-url").val();
+        
+        $("body").addClass("hide-scrollbar");
+        $('#loading-indicator').show();
         
         // only make ajax call when we have data
         if (feedName && feedUrl) {
@@ -185,7 +191,7 @@ $(document).ready(function() {
                     diff = "> 30";
                 };
                 $("#news-" + response[index].feed_id).html("");                
-                $("#news-" + response[index].feed_id).html(diff + " minutes ago");
+                $("#news-" + response[index].feed_id).html(diff + "m ago");
             });
         });
     }
