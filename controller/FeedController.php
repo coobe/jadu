@@ -102,17 +102,25 @@ class FeedController extends AjaxController
             exit();
         }
         
-        $sql = $this->pdo->prepare("INSERT INTO jadu.feeds(display_name, url) VALUES(:name, :url);");
-        if (!$sql->execute(array(":name" => $this->feed->getName(), ":url" => $this->feed->getUrl()))) {
+        try {
+            $this->pdo->beginTransaction();
+            $sql = $this->pdo->prepare("INSERT INTO jadu.feeds(display_name, url) VALUES(:name, :url);");
+            $sql->execute(array(":name" => $this->feed->getName(), ":url" => $this->feed->getUrl()));
+            
+            $sql = $this->pdo->prepare("INSERT INTO jadu.users_feeds(user_id, feed_id) VALUES(:id, LAST_INSERT_ID());");
+            $sql->execute(array(":id" => $this->user->getUserId()));
+            
+            $this->pdo->commit();
+
+        } catch (Exception $e) {
+            $this->pdo->rollback();
             $errorMessage = "Could not Insert at Database " . DB_NAME . " at "  . DB_HOST;
             include("./view/error.php");
-        } else {
-            $sql = $this->pdo->prepare("INSERT INTO jadu.users_feeds(user_id, feed_id) VALUES(:id, LAST_INSERT_ID());");
-            if ($sql->execute(array(":id" => $this->user->getUserId()))) {
-                include("./view/rss_table.php");
-                exit();
-            }
         }
+
+        include("./view/rss_table.php");
+        exit();
+        
     }    
     
     /**
