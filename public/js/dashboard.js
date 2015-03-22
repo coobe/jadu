@@ -76,7 +76,7 @@ $(document).ready(function() {
         autoOpen: false,  
         resizable: false,
         draggable: false,
-        width: 400,
+        width: 430,
         position: {
             my: "center",
             at: "center",

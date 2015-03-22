@@ -83,6 +83,20 @@ class UserController extends AjaxController
     */
     public function register($name, $password)
     {
+        // check for incorrect input data
+        if ((strlen($name) < 4) || (strlen($password) < 4)) {
+            $errorMessage                   = "username or password length must be 4 characters or greater";
+            include("./view/error.php"); 
+            exit();
+        };
+        
+        // check for incorrect input data
+        if ((strlen($name) > 9) || (strlen($password) > 9)) {
+            $errorMessage                   = "username or password length cannot exceed 9 characters";
+            include("./view/error.php"); 
+            exit();
+        };
+        
         // check if username already exists
         $sql = $this->pdo->prepare("SELECT name FROM users WHERE name = :name");
         $userExists = false;
@@ -121,6 +135,7 @@ class UserController extends AjaxController
         } elseif (!empty($_POST["username"]) && !empty($_POST["password"])) {
             $userName   = htmlspecialchars($_POST["username"]);
             $password   = md5(htmlspecialchars($_POST["password"]));
+
             $sql        = $this->pdo->prepare("SELECT id, name FROM users WHERE name = :name and password = :password");
             
             if ($sql->execute(array(":name" => $userName, ":password" => $password))) {

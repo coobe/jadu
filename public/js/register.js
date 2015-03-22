@@ -10,7 +10,7 @@ $(document).ready(function() {
         autoOpen: false,  
         resizable: false,
         draggable: false,
-        width: 400,
+        width: 430,
         position: {
             my: "center",
             at: "center",
@@ -27,6 +27,10 @@ $(document).ready(function() {
     });
     
     $("#register-link").unbind().click(function(e) {
+        $("#register-error").hide();
+        $("#user-name").val("");
+        $("#register-password").val("");
+        $("#confirm-password").val("");
         $("#register-user-dialog").dialog("open"); 
     });
 
@@ -36,10 +40,31 @@ $(document).ready(function() {
         var password        = $("#register-password").val();
         var passwordConfirm = $("#confirm-password").val();
         
-        if (password !== passwordConfirm) {
+        // check for whitespaces
+        if ((userName.indexOf(" ") >= 0) || (password.indexOf(" ") >= 0)) {
+            $("#register-error").html("you cannot have whitespaces in your Username or Password");
+            $("#register-error").show();
+            return;
+        }
+        
+        // check for minimum string sizes
+        if ((userName.length < 4) || (password.length < 4)) {
+            $("#register-error").html("Username and passwords must be at least 4 characters long");
+            $("#register-error").show();
+            return;
+        }
+        
+        // check for maximum string sizes
+        if ((userName.length > 9) || (password.length >= 9)) {
+            $("#register-error").html("username and password cannot be longer than 9 characters");
+            $("#register-error").show();
+            return;
+        }
+        
+        if (password != passwordConfirm) {
             $("#register-error").html("passwords do not match");
             $("#register-error").show();
-        } else {
+        } else if ((userName != "") && (password != "") && (passwordConfirm != "")) {
             $.ajax({
                 method: "post",
                 url: "ajax_handler.php",
