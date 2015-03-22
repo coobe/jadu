@@ -51,7 +51,7 @@ class FeedController extends AjaxController
                 $this->delete($feedId);
                 break;
             case "add":
-                $this->feed = new Feed(null, $pRequest["feed_name"], $pRequest["feed_url"]);
+                $this->feed = new Feed(null, $pRequest["feed_name"], $pRequest["feed_url"], time());
                 $this->add();
                 break;
             case "read":
