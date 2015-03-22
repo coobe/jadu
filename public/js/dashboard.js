@@ -1,7 +1,8 @@
 $(document).ready(function() {
     var hideAjaxLoader;
-    // check every 60 seconds for unread feeds and display notifications
+    
     loadLastReadTimes(); // update times on start
+    // check every 45 seconds for unread feeds and display notifications
     setInterval(loadLastReadTimes, 45000);
     
     
