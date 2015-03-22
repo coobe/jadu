@@ -167,6 +167,10 @@ $(document).ready(function() {
             json.push($(this).attr("feed-id"));    
         });
         
+        if (json.length == 0) {
+            return;
+        }
+        
         hideAjaxLoader = 1
         
         $.ajax({
