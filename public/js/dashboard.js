@@ -1,4 +1,9 @@
 $(document).ready(function() {
+    var hideAjaxLoader;
+    // check every 60 seconds for unread feeds and display notifications
+    loadLastReadTimes(); // update times on start
+    setInterval(loadLastReadTimes, 45000);
+    
     
     // hide message box initially
     $("#message-box").hide();
@@ -19,10 +24,14 @@ $(document).ready(function() {
         }
     });
     
+    // ajax callbacks
     $(document).ajaxSend(function(event, request, settings) {
-        $("body").addClass("hide-scrollbar");
-        $('#loading-indicator').show();
-
+        if (hideAjaxLoader = 1) {
+            hideAjaxLoader = 0;
+        } else {
+            $("body").addClass("hide-scrollbar");
+            $('#loading-indicator').show();
+        }
     });
 
     $(document).ajaxComplete(function(event, request, settings) {
@@ -36,7 +45,8 @@ $(document).ready(function() {
         if (e.target.nodeName === "BUTTON") {
             return;
         }
-        
+        $("body").addClass("hide-scrollbar");
+            $('#loading-indicator').show();
         var feedId      = $(this).attr("feed-id");
         var feedName    = $(this).attr("feed-name");
         $.ajax({
@@ -44,6 +54,7 @@ $(document).ready(function() {
             url: "ajax_handler.php",
             data: {feed: feedId, target: "feed", method: "read"}
         }).done(function(response) {
+            loadLastReadTimes();
             $("#read-feed-dialog").html(response);
             $(".ui-dialog-title").html("Feeds from " + feedName);
             $("#read-feed-dialog").dialog("open");
@@ -144,5 +155,34 @@ $(document).ready(function() {
         };
         $("#message-box").html(message);
         $("#message-box").fadeIn(1400).fadeOut(1400);
+    }
+    
+    /**
+    * update times displayed when the feed was last read
+    */
+    function loadLastReadTimes() {
+        var feedId = $(this).attr("id")
+        var json = new Array();
+        $(".rss-row").each(function(index) {
+            json.push($(this).attr("feed-id"));    
+        });
+        
+        hideAjaxLoader = 1
+        
+        $.ajax({
+            method: "post",
+            url: "ajax_handler.php",
+            data: {feeds: json, target: "feed", method: "check"},
+            dataType:'json'
+        }).done(function(response) {
+            $.each(response, function(index) {
+                var diff = new Date(new Date().getTime() - response[index].last_read * 1000).getMinutes();
+                if (diff > 30) {
+                    diff = "> 30";
+                };
+                $("#news-" + response[index].feed_id).html("");                
+                $("#news-" + response[index].feed_id).html(diff + " minutes ago");
+            });
+        });
     }
 });

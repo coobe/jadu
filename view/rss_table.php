@@ -9,19 +9,27 @@
         <tr>
             <th>Name</th>
             <th>Url</th>
+            <th>Last read</th>
             <th></th>
         </tr>
         <?php
         require_once("./model/User.php");
         require_once("./model/Feed.php");
+        require_once("./model/Story.php");
 
         $user = $_SESSION["user"];
 
         // iterate over feeds of the user
         foreach ($user->getRssFeeds() as $feed) { ?>
-            <tr class="rss-row" feed-id="<?php echo $feed->getId(); ?>" feed-name="<?php echo $feed->getName(); ?>">
+            <tr id="feed-<?php echo $feed->getId(); ?>" 
+                class="rss-row" 
+                feed-id="<?php echo $feed->getId(); ?>" 
+                feed-name="<?php echo $feed->getName(); ?>"
+                last-read="<?php echo $feed->getLastRead(); ?>">
+                                            
                 <td><?php echo $feed->getName(); ?></td>
                 <td><?php echo $feed->getUrl(); ?></td>
+                <td id="news-<?php echo $feed->getId(); ?>"></td>
                 <td><button class="btn-delete-feed btn-danger" feed-id="<?php echo $feed->getId(); ?>">delete</button></td>
             </tr>
         <?php

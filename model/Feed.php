@@ -29,13 +29,19 @@ class Feed
     private $id;
     
     /**
+    * @var string
+    */
+    private $lastRead = 0;
+    
+    /**
     * @param $pName, $pUrl
     */ 
-    public function __construct($pId, $pName, $pUrl) 
+    public function __construct($pId, $pName, $pUrl, $pLastRead) 
     {
-        $this->id           = $pId;
-        $this->name         = $pName;
-        $this->url          = $pUrl;
+        $this->id                = $pId;
+        $this->name              = $pName;
+        $this->url               = $pUrl;
+        $this->lastRead          = $pLastRead;
     }
     
     
@@ -48,11 +54,19 @@ class Feed
     }
     
     /**
-    * @returns string
+    * @param int
     */ 
-    public function getName() 
+    public function setLastRead() 
     {
-        return $this->name;
+        $this->lastRead = time();
+    }
+    
+    /**
+    * @returns int
+    */ 
+    public function getLastRead() 
+    {
+        return $this->lastRead;
     }
     
     /**
@@ -61,6 +75,14 @@ class Feed
     public function getUrl() 
     {
         return $this->url;
+    }
+    
+    /**
+    * @returns string
+    */ 
+    public function getName() 
+    {
+        return $this->name;
     }
     
     /**

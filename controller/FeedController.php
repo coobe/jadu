@@ -58,6 +58,14 @@ class FeedController extends AjaxController
                 $feedId     = $pRequest["feed"];
                 $this->read($feedId);
                 break;
+            case "check":
+                if (isset($pRequest["feeds"])) 
+                {
+                    $feeds     = $pRequest["feeds"];
+                    $this->check($feeds);
+                };
+                
+                break;
             default: 
                 echo "Wrong method supplied at FeedController";
                 break;
@@ -108,16 +116,38 @@ class FeedController extends AjaxController
     }    
     
     /**
+    * check for last time a feed has been read
+    * 
+    * @param $pFeedId
+    */
+    private function check($pFeeds) 
+    {
+        $response   = array();
+        
+        foreach($pFeeds as $key => $val) {
+            $sql = $this->pdo->prepare("SELECT feed_id, UNIX_TIMESTAMP(feeds.last_read) AS last_read FROM users_feeds JOIN feeds ON feeds.id = users_feeds.feed_id WHERE user_id = :user_id AND feed_id = :feed_id");
+            $sql->execute(array(":user_id" => $this->user->getUserId(), ":feed_id" => $val));
+            $result = $sql->fetch();
+            
+            array_push($response, $result);
+        }
+        echo json_encode($response);
+        exit();
+    }
+    
+    /**
     * read a given feed and render the feed dialog
     * 
     * @param $pFeedId
     */
     private function read($pFeedId) 
     {
+        $time = time();
+        
         $sql = $this->pdo->prepare("SELECT id, display_name, url FROM feeds WHERE id = :id");
         if ($sql->execute(array(":id" => $pFeedId))) {
             $result  = $sql->fetch();
-            $this->feed = new Feed($pFeedId, $result["display_name"], $result["url"]);
+            $this->feed = new Feed($pFeedId, $result["display_name"], $result["url"], $time);
             $feedXML = @simplexml_load_file($this->feed->getUrl());
             
             if ($feedXML) {
@@ -144,6 +174,10 @@ class FeedController extends AjaxController
                     $story = new Story(strip_tags($currentStory->title), strip_tags($currentStory->description), strip_tags($currentStory->link), strip_tags($currentStory->date));
                     $this->feed->addStory($story);
                 }
+
+                // update read timestamp of feed
+                $sql = $this->pdo->prepare("UPDATE feeds SET last_read = NOW() WHERE id = :feed_id");
+                $sql->execute(array(":feed_id" => $pFeedId));
 
                 $feed = $this->feed;
                 include("./view/read_feed.php");   
