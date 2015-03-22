@@ -23,26 +23,13 @@ class UserController extends AjaxController
     private $userName;
     
     /**
-    * @var int
-    */
-    private $isAdmin = 0;
-    
-    /**
-    * @var array
-    */
-    private $feedArray = array();
-    
-    /**
-    * stores error messages for display in the view
-    * @var array
-    */ 
-    public $errors = array();
-    
-    /**
     * @var object
     */
     private $user;
     
+    /**
+    * @var PDO
+    */
     private $pdo;
     
     public function __construct() 
@@ -81,17 +68,17 @@ class UserController extends AjaxController
     *
     * @returns boolean
     */
-    public function register($name, $password)
+    public function register($pName, $pPassword)
     {
         // check for incorrect input data
-        if ((strlen($name) < 4) || (strlen($password) < 4)) {
+        if ((strlen($pName) < 4) || (strlen($pPassword) < 4)) {
             $errorMessage                   = "username or password length must be 4 characters or greater";
             include("./view/error.php"); 
             exit();
         };
         
         // check for incorrect input data
-        if ((strlen($name) > 9) || (strlen($password) > 9)) {
+        if ((strlen($pName) > 9) || (strlen($pPassword) > 9)) {
             $errorMessage                   = "username or password length cannot exceed 9 characters";
             include("./view/error.php"); 
             exit();
@@ -100,7 +87,7 @@ class UserController extends AjaxController
         // check if username already exists
         $sql = $this->pdo->prepare("SELECT name FROM users WHERE name = :name");
         $userExists = false;
-        if ($sql->execute(array(":name" => $name))) {
+        if ($sql->execute(array(":name" => $pName))) {
             while($row = $sql->fetch()) {
                 $userExists = true;
             }
@@ -112,7 +99,7 @@ class UserController extends AjaxController
         if (!$userExists) {               
             // user does not exist go ahead and save user        
             $sql = $this->pdo->prepare("INSERT INTO users (name, password) VALUES(:name, :pw)");
-            if ($sql->execute(array(":name" => $name, "pw" => md5($password)))) {
+            if ($sql->execute(array(":name" => $pName, "pw" => md5($pPassword)))) {
                 return true;
             } else {
                 $errorMessage = "Could not connect to Database " . DB_NAME . " at "  . DB_HOST;

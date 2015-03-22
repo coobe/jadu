@@ -7,5 +7,5 @@
 */
 abstract class AjaxController
 {
-    public abstract function execute($request);
+    public abstract function execute($pRequest);
 }

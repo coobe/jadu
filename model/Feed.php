@@ -24,12 +24,27 @@ class Feed
     private $url;
     
     /**
+    * @var int
+    */
+    private $id;
+    
+    /**
     * @param $pName, $pUrl
     */ 
-    public function __construct($pName, $pUrl) 
+    public function __construct($pId, $pName, $pUrl) 
     {
+        $this->id           = $pId;
         $this->name         = $pName;
         $this->url          = $pUrl;
+    }
+    
+    
+    /**
+    * @returns int
+    */ 
+    public function getId() 
+    {
+        return $this->id;
     }
     
     /**

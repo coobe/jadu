@@ -3,7 +3,6 @@ require("AjaxController.php");
 require("./config/db.php");
 require("UserController.php");
 require("model/Story.php");
-require("model/Feed.php");
 
 /**
 * Handles ajax requests regarding Feeds
@@ -52,7 +51,7 @@ class FeedController extends AjaxController
                 $this->delete($feedId);
                 break;
             case "add":
-                $this->feed = new Feed($pRequest["feed_name"], $pRequest["feed_url"]);
+                $this->feed = new Feed(null, $pRequest["feed_name"], $pRequest["feed_url"]);
                 $this->add();
                 break;
             case "read":
@@ -108,13 +107,26 @@ class FeedController extends AjaxController
     */
     private function read($pFeedId) 
     {
-        $sql = $this->pdo->prepare("SELECT display_name, url FROM feeds WHERE id = :id");
+        $sql = $this->pdo->prepare("SELECT id, display_name, url FROM feeds WHERE id = :id");
         if ($sql->execute(array(":id" => $pFeedId))) {
             $result  = $sql->fetch();
-            $this->feed = new Feed($result["display_name"], $result["url"]);
-            $feedXML = @simplexml_load_file($this->feed->getUrl());  
-
+            $this->feed = new Feed($pFeedId, $result["display_name"], $result["url"]);
+            $feedXML = @simplexml_load_file($this->feed->getUrl());
+            
             if ($feedXML) {
+                
+                if (!isset($feedXML->channel->item) && !isset($feedXML->item)) 
+                {
+                    $errorMessage = "could not parse feed at <b>" . $this->feed->getUrl() . "</b>. Please check the XML Structure";
+                    include("./view/error.php");
+                    exit();
+                }
+                
+                foreach($feedXML->channel->item as $currentStory) {
+                    $story = new Story(strip_tags($currentStory->title), strip_tags($currentStory->description), strip_tags($currentStory->link), strip_tags($currentStory->date));
+                    $this->feed->addStory($story);
+                }
+                
                 foreach($feedXML->channel->item as $currentStory) {
                     $story = new Story(strip_tags($currentStory->title), strip_tags($currentStory->description), strip_tags($currentStory->link), strip_tags($currentStory->date));
                     $this->feed->addStory($story);

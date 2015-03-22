@@ -1,0 +1,16 @@
+
+
+- DB-Model + SQL Deploy scripts (2h)
+- created a rapid prototype (4h)
+- created testplan (1h)
+- identified missing features and bugs, issue tracking(2h)
+  work through testplan after every issue
+- remodeling backend for MVC Architecture (2h)
+- streamlined UI (3h)
+- created User registration feature (2h)
+- creation, deletion, reading of feeds (3h)
+- misc Bugfixes (2h)
+- Documentation (2h)
+
+
+Total: 23h
