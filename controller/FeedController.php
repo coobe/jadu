@@ -87,6 +87,13 @@ class FeedController extends AjaxController
     */
     private function add()
     {
+        // check if the feed is correct and can be parsed
+        $feedXML = @simplexml_load_file($this->feed->getUrl());
+        if (!$feedXML) {
+            echo -1; // error flag for ajax call
+            exit();
+        }
+        
         $sql = $this->pdo->prepare("INSERT INTO jadu.feeds(display_name, url) VALUES(:name, :url);");
         if (!$sql->execute(array(":name" => $this->feed->getName(), ":url" => $this->feed->getUrl()))) {
             $errorMessage = "Could not Insert at Database " . DB_NAME . " at "  . DB_HOST;
@@ -98,7 +105,7 @@ class FeedController extends AjaxController
                 exit();
             }
         }
-    }
+    }    
     
     /**
     * read a given feed and render the feed dialog

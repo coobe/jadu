@@ -105,7 +105,15 @@ $(document).ready(function() {
             }).done(function(response) {
                 $("#feed-name").val("");
                 $("#feed-url").val("");
-                afterAjaxTasks("#add-feed-dialog", "added new RSS Feed", "#rss-table", response);
+                
+                if (response != -1) {
+                    afterAjaxTasks("#add-feed-dialog", "added new RSS Feed", "#rss-table", response);
+                } else {
+                    $("#add-feed-error").html("The given URL cannot be parsed");
+                    $("body").removeClass("hide-scrollbar");
+                    $("#loading-indicator").hide();
+                    $("#add-feed-error").fadeIn(1400).fadeOut(1400);
+                }
             });     
         }        
     });
