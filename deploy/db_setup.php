@@ -13,10 +13,10 @@ $dbConnection->query("CREATE TABLE IF NOT EXISTS jadu.users (id int NOT NULL AUT
 $dbConnection->query("INSERT INTO jadu.users (name, password) VALUES ('dummy', '" . md5("dummy") . "');") or die("a mysql error has occured: " . $dbConnection->errno);
 
 $dbConnection->query("CREATE TABLE IF NOT EXISTS jadu.feeds (id int NOT NULL AUTO_INCREMENT PRIMARY KEY, url varchar(150) NOT NULL, display_name varchar(50) NOT NULL, last_read TIMESTAMP);") or die("a mysql error has occured: " . $dbConnection->errno);
-$dbConnection->query("INSERT INTO jadu.feeds (url, display_name, last_read) VALUES ('http://www.php.net/news.rss', 'php.net', 0);") or die("a mysql error has occured: " . $dbConnection->errno);
-$dbConnection->query("INSERT INTO jadu.feeds (url, display_name, last_read) VALUES ('http://slashdot.org/rss/slashdot.rss', 'slashdot', 0);") or die("a mysql error has occured: " . $dbConnection->errno);
-$dbConnection->query("INSERT INTO jadu.feeds (url, display_name, last_read) VALUES ('http://feeds.bbci.co.uk/news/rss.xml?edition=uk', 'bbc', 0);") or die("a mysql error has occured: " . $dbConnection->errno);
-$dbConnection->query("INSERT INTO jadu.feeds (url, display_name, last_read) VALUES ('http://www.reddit.com/r/php/.rss', 'reddit/php', 0);") or die("a mysql error has occured: " . $dbConnection->errno);
+$dbConnection->query("INSERT INTO jadu.feeds (url, display_name) VALUES ('http://www.php.net/news.rss', 'php.net');") or die("a mysql error has occured: " . $dbConnection->errno);
+$dbConnection->query("INSERT INTO jadu.feeds (url, display_name) VALUES ('http://slashdot.org/rss/slashdot.rss', 'slashdot');") or die("a mysql error has occured: " . $dbConnection->errno);
+$dbConnection->query("INSERT INTO jadu.feeds (url, display_name) VALUES ('http://feeds.bbci.co.uk/news/rss.xml?edition=uk', 'bbc');") or die("a mysql error has occured: " . $dbConnection->errno);
+$dbConnection->query("INSERT INTO jadu.feeds (url, display_name) VALUES ('http://www.reddit.com/r/php/.rss', 'reddit/php');") or die("a mysql error has occured: " . $dbConnection->errno);
 
 $dbConnection->query("CREATE TABLE IF NOT EXISTS jadu.users_feeds (user_id int NOT NULL, feed_id int NOT NULL);") or die("a mysql error has occured: " . $dbConnection->errno);
 $dbConnection->query("ALTER TABLE jadu.users_feeds ADD CONSTRAINT fk_users FOREIGN KEY (user_id) REFERENCES jadu.users(id) ON DELETE CASCADE;") or die("a mysql error has occured: " . $dbConnection->errno);

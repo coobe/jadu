@@ -67,9 +67,6 @@ $(document).ready(function() {
         // confirmation check
         var popupChoice = confirm("Do you really want to delete this feed ?");
         
-        $("body").addClass("hide-scrollbar");
-        $('#loading-indicator').show();
-        
         // make ajax call and delete the feed
         if (popupChoice) {
             var feed_id = $.trim($(this).attr("feed-id"));
