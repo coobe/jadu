@@ -1,5 +1,6 @@
 # RSS Web-app
 Users can add, list and read rss feeds
+built with pure PHP (no frameworks, no template engine)
 
 # installation 
 - requirements: apache webserver(php 5.x), mysql db
